@@ -1,18 +1,58 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchGames } from '@/lib/api/sports-data';
 import { useStore } from '@/lib/store';
 import GameCard from './GameCard';
+import SearchFilter, { FilterState } from './SearchFilter';
 import { motion } from 'framer-motion';
 
 export default function GamesList() {
   const { selectedLeague } = useStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState<FilterState>({
+    minConfidence: 0,
+    betTypes: [],
+    status: [],
+    teams: [],
+  });
 
   const { data: games, isLoading, error } = useQuery({
     queryKey: ['games', selectedLeague],
     queryFn: () => fetchGames(selectedLeague === 'ALL' ? undefined : selectedLeague),
   });
+
+  // Filter games based on search and filters
+  const filteredGames = useMemo(() => {
+    if (!games) return [];
+
+    return games.filter((game) => {
+      // Search filter
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = 
+          game.homeTeam.name.toLowerCase().includes(search) ||
+          game.awayTeam.name.toLowerCase().includes(search) ||
+          game.homeTeam.abbreviation.toLowerCase().includes(search) ||
+          game.awayTeam.abbreviation.toLowerCase().includes(search);
+        
+        if (!matchesSearch) return false;
+      }
+
+      // Confidence filter
+      if (filters.minConfidence > 0 && game.prediction) {
+        if (game.prediction.confidence < filters.minConfidence) return false;
+      }
+
+      // Status filter
+      if (filters.status.length > 0) {
+        if (!filters.status.includes(game.status)) return false;
+      }
+
+      return true;
+    });
+  }, [games, searchTerm, filters]);
 
   if (isLoading) {
     return (
@@ -42,21 +82,35 @@ export default function GamesList() {
           {selectedLeague === 'ALL' ? 'All Games' : selectedLeague} Predictions
         </h2>
         <span className="text-sm text-gray-400">
-          {games?.length || 0} games available
+          {filteredGames.length} of {games?.length || 0} games
         </span>
       </div>
 
+      {/* Search and Filter */}
+      <SearchFilter 
+        onSearchChange={setSearchTerm}
+        onFilterChange={setFilters}
+      />
+
+      {/* Games List */}
       <div className="space-y-4">
-        {games?.map((game, index) => (
-          <motion.div
-            key={game.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <GameCard game={game} />
-          </motion.div>
-        ))}
+        {filteredGames.length === 0 ? (
+          <div className="glass-morphism rounded-xl p-12 text-center">
+            <p className="text-gray-400 text-lg mb-2">No games found</p>
+            <p className="text-sm text-gray-500">Try adjusting your filters</p>
+          </div>
+        ) : (
+          filteredGames.map((game, index) => (
+            <motion.div
+              key={game.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <GameCard game={game} />
+            </motion.div>
+          ))
+        )}
       </div>
     </div>
   );

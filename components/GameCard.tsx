@@ -11,11 +11,15 @@ import {
   ChevronDown, 
   ChevronUp,
   Calendar,
-  Activity
+  Activity,
+  BarChart3,
+  Clock
 } from 'lucide-react';
 import { formatDate, formatOdds, getConfidenceLevel } from '@/lib/utils';
 import { useStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
+import TeamComparison from './TeamComparison';
+import OddsMovement from './OddsMovement';
 
 interface GameCardProps {
   game: Game;
@@ -23,6 +27,8 @@ interface GameCardProps {
 
 export default function GameCard({ game }: GameCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
+  const [showOddsMovement, setShowOddsMovement] = useState(false);
   const { addParlayLeg, parlayLegs } = useStore();
   
   const isInParlay = parlayLegs.some(leg => leg.gameId === game.id);
@@ -166,20 +172,30 @@ export default function GameCard({ game }: GameCardProps) {
           </div>
         )}
 
-        {/* Expand Button */}
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="w-full px-6 py-3 bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center space-x-2"
-        >
-          <span className="text-sm text-gray-400">
-            {expanded ? 'Show Less' : 'View Detailed Analysis'}
-          </span>
-          {expanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
-          )}
-        </button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-3 gap-2 px-6 pb-4">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-sm text-gray-400 flex items-center justify-center space-x-1"
+          >
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span>Analysis</span>
+          </button>
+          <button
+            onClick={() => setShowComparison(!showComparison)}
+            className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-sm text-gray-400 flex items-center justify-center space-x-1"
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Compare</span>
+          </button>
+          <button
+            onClick={() => setShowOddsMovement(!showOddsMovement)}
+            className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-sm text-gray-400 flex items-center justify-center space-x-1"
+          >
+            <Clock className="w-4 h-4" />
+            <span>Odds</span>
+          </button>
+        </div>
 
         {/* Expanded Details */}
         <AnimatePresence>
@@ -209,6 +225,40 @@ export default function GameCard({ game }: GameCardProps) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Team Comparison */}
+        <AnimatePresence>
+          {showComparison && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="p-6 bg-white/5">
+                <TeamComparison game={game} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Odds Movement */}
+        <AnimatePresence>
+          {showOddsMovement && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="p-6 bg-white/5">
+                <OddsMovement gameId={game.id} />
               </div>
             </motion.div>
           )}

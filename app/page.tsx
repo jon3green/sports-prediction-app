@@ -4,6 +4,7 @@ import Hero from '@/components/Hero';
 import GamesList from '@/components/GamesList';
 import ParlayBuilder from '@/components/ParlayBuilder';
 import StatsOverview from '@/components/StatsOverview';
+import BettingCalculator from '@/components/BettingCalculator';
 import Footer from '@/components/Footer';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 
@@ -19,15 +20,19 @@ export default function Home() {
         </Suspense>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <Suspense fallback={<LoadingSkeleton />}>
               <GamesList />
             </Suspense>
           </div>
           
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <Suspense fallback={<LoadingSkeleton />}>
               <ParlayBuilder />
+            </Suspense>
+            
+            <Suspense fallback={<LoadingSkeleton />}>
+              <BettingCalculator />
             </Suspense>
           </div>
         </div>
