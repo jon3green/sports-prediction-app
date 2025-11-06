@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import Header from '@/components/Header';
+import HeaderWithAuth from '@/components/HeaderWithAuth';
 import Hero from '@/components/Hero';
 import GamesList from '@/components/GamesList';
 import ParlayBuilder from '@/components/ParlayBuilder';
@@ -11,7 +11,7 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <Header />
+      <HeaderWithAuth />
       <Hero />
       
       <div className="container mx-auto px-4 py-8 space-y-8">

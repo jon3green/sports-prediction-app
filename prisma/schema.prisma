@@ -1,0 +1,211 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String    // hashed
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // User preferences
+  favoriteTeams String?   // JSON array of team IDs
+  notifications Boolean   @default(true)
+  
+  // Relations
+  bets          Bet[]
+  parlays       Parlay[]
+  favorites     Favorite[]
+  sessions      Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Bet {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Bet details
+  betType       String    // 'single', 'parlay', 'teaser'
+  sport         String    // 'NFL', 'NCAAF'
+  stake         Float
+  odds          Float     // American odds
+  potentialWin  Float
+  
+  // Game/Player info
+  gameId        String?
+  playerName    String?
+  teamName      String?
+  betCategory   String    // 'spread', 'moneyline', 'total', 'player_prop'
+  selection     String    // e.g., "Over 250.5 yards", "Chiefs -3.5"
+  
+  // Status
+  status        String    @default("pending") // 'pending', 'won', 'lost', 'pushed'
+  settledAt     DateTime?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relation
+  parlayId      String?
+  parlay        Parlay?   @relation(fields: [parlayId], references: [id])
+}
+
+model Parlay {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Parlay details
+  legs          Int       // number of legs
+  stake         Float
+  totalOdds     Float
+  potentialWin  Float
+  
+  // Quality metrics
+  qualityScore  Int?      // 0-100
+  expectedValue Float?
+  
+  // Status
+  status        String    @default("pending") // 'pending', 'won', 'lost', 'partial'
+  settledAt     DateTime?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  bets          Bet[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Favorite item
+  type      String   // 'team', 'player', 'game'
+  itemId    String   // team ID, player ID, or game ID
+  name      String
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, type, itemId])
+}
+
+model Player {
+  id              String   @id @default(cuid())
+  name            String
+  team            String
+  position        String
+  number          Int?
+  sport           String   // 'NFL', 'NCAAF'
+  
+  // Stats (stored as JSON for flexibility)
+  seasonStats     String?  // JSON
+  lastGameStats   String?  // JSON
+  careerStats     String?  // JSON
+  
+  // Images
+  image           String?
+  teamLogo        String?
+  
+  // Meta
+  isActive        Boolean  @default(true)
+  lastUpdated     DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  
+  @@unique([name, team])
+}
+
+model Game {
+  id              String   @id @default(cuid())
+  externalId      String?  @unique
+  
+  // Game info
+  sport           String   // 'NFL', 'NCAAF'
+  week            Int?
+  season          Int
+  
+  // Teams
+  homeTeam        String
+  awayTeam        String
+  homeTeamId      String?
+  awayTeamId      String?
+  
+  // Scores
+  homeScore       Int?
+  awayScore       Int?
+  
+  // Odds from Hard Rock Bet
+  spreadHome      Float?
+  spreadAway      Float?
+  spreadHomeOdds  Float?
+  spreadAwayOdds  Float?
+  
+  moneylineHome   Float?
+  moneylineAway   Float?
+  
+  totalLine       Float?
+  overOdds        Float?
+  underOdds       Float?
+  
+  // Timestamps
+  gameTime        DateTime
+  status          String   @default("scheduled") // 'scheduled', 'live', 'final'
+  lastOddsUpdate  DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PlayerProp {
+  id              String   @id @default(cuid())
+  
+  // Player info
+  playerId        String
+  playerName      String
+  team            String
+  position        String
+  
+  // Game info
+  gameId          String
+  opponent        String
+  
+  // Prop details
+  propType        String   // 'passing_yards', 'rushing_yards', 'receiving_yards', 'touchdowns', etc.
+  line            Float
+  overOdds        Float?
+  underOdds       Float?
+  
+  // Source
+  sportsbook      String   @default("Hard Rock Bet")
+  
+  // Timestamps
+  gameTime        DateTime
+  lastUpdated     DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  
+  @@index([gameId])
+  @@index([playerId])
+}
