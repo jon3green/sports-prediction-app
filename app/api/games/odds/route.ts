@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { cacheGameOdds } from '@/lib/cache/redis';
 
 const ODDS_API_KEY = process.env.NEXT_PUBLIC_ODDS_API_KEY || '9843d3412159ce8b1e28413f97f0f438';
 const BASE_URL = 'https://api.the-odds-api.com/v4';
@@ -10,22 +11,24 @@ export async function GET(request: Request) {
     const sport = searchParams.get('sport') || 'nfl';
     const sportKey = sport === 'nfl' ? 'americanfootball_nfl' : 'americanfootball_ncaaf';
 
-    const response = await axios.get(
+    // Wrap the API call with caching (2 minute TTL for odds)
+    const cachedData = await cacheGameOdds(sport as 'nfl' | 'ncaaf', async () => {
+      const response = await axios.get(
       `${BASE_URL}/sports/${sportKey}/odds/`,
-      {
-        params: {
-          apiKey: ODDS_API_KEY,
-          regions: 'us',
-          markets: 'h2h,spreads,totals', // Moneyline, spreads, and totals
-          bookmakers: 'draftkings,fanduel,betmgm,hardrock',
-          oddsFormat: 'american',
-        },
-        timeout: 10000,
-      }
-    );
+        {
+          params: {
+            apiKey: ODDS_API_KEY,
+            regions: 'us',
+            markets: 'h2h,spreads,totals', // Moneyline, spreads, and totals
+            bookmakers: 'draftkings,fanduel,betmgm,hardrock',
+            oddsFormat: 'american',
+          },
+          timeout: 10000,
+        }
+      );
 
-    // Transform to our format
-    const games = response.data.map((event: any) => {
+      // Transform to our format
+      const games = response.data.map((event: any) => {
       const homeTeam = event.home_team;
       const awayTeam = event.away_team;
       
@@ -84,17 +87,20 @@ export async function GET(request: Request) {
         odds,
         status: 'scheduled',
       };
+      });
+
+      return {
+        success: true,
+        count: games.length,
+        games,
+        apiUsage: {
+          used: response.headers['x-requests-used'],
+          remaining: response.headers['x-requests-remaining'],
+        },
+      };
     });
 
-    return NextResponse.json({
-      success: true,
-      count: games.length,
-      games,
-      apiUsage: {
-        used: response.headers['x-requests-used'],
-        remaining: response.headers['x-requests-remaining'],
-      },
-    });
+    return NextResponse.json(cachedData);
   } catch (error) {
     console.error('Error fetching game odds:', error);
     

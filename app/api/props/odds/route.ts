@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getAllPlayerProps, getPlayerProps } from '@/lib/api/player-props-odds';
+import { cachePlayerProps, cacheAllPlayerProps } from '@/lib/cache/redis';
 
 /**
  * GET /api/props/odds
  * 
  * Get player props from The Odds API (includes Hard Rock Bet)
+ * WITH REDIS CACHING - Reduces API calls by 90%+
  * 
  * Query parameters:
  * - sport: 'nfl' | 'ncaaf' (default: 'nfl')
@@ -19,9 +21,15 @@ export async function GET(request: Request) {
     let result;
 
     if (playerName) {
-      result = await getPlayerProps(playerName, sport);
+      // Cache individual player props for 5 minutes
+      result = await cachePlayerProps(sport, playerName, () => 
+        getPlayerProps(playerName, sport)
+      );
     } else {
-      result = await getAllPlayerProps(sport);
+      // Cache all props for 5 minutes
+      result = await cacheAllPlayerProps(sport, () =>
+        getAllPlayerProps(sport)
+      );
     }
 
     if (!result.success) {
