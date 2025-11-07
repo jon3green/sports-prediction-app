@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchGames } from '@/lib/api/sports-data';
 import { useStore } from '@/lib/store';
-import GameCard from './GameCard';
+import GameCardEnhanced from './GameCardEnhanced';
 import SearchFilter, { FilterState } from './SearchFilter';
 import { motion } from 'framer-motion';
 
@@ -107,7 +107,7 @@ export default function GamesList() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              <GameCard game={game} />
+              <GameCardEnhanced game={game} />
             </motion.div>
           ))
         )}

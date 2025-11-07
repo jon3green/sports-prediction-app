@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import HeaderWithAuth from '@/components/HeaderWithAuth';
-import Hero from '@/components/Hero';
+import HeroNew from '@/components/HeroNew';
 import GamesList from '@/components/GamesList';
-import ParlayBuilder from '@/components/ParlayBuilder';
+import ParlayBuilderEnhanced from '@/components/ParlayBuilderEnhanced';
+import FeaturedProps from '@/components/FeaturedProps';
 import StatsOverview from '@/components/StatsOverview';
 import BettingCalculator from '@/components/BettingCalculator';
 import Footer from '@/components/Footer';
@@ -10,25 +11,41 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-black">
+      {/* Background Effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:14px_24px]" />
+      </div>
+
       <HeaderWithAuth />
-      <Hero />
+      <HeroNew />
       
-      <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="container mx-auto px-4 py-12 space-y-12 relative">
+        {/* Stats Overview */}
         <Suspense fallback={<LoadingSkeleton />}>
           <StatsOverview />
         </Suspense>
-        
+
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+          {/* Left Column - Games & Featured Props */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Featured Props - Above Games */}
+            <Suspense fallback={<LoadingSkeleton />}>
+              <FeaturedProps />
+            </Suspense>
+
+            {/* Games List */}
             <Suspense fallback={<LoadingSkeleton />}>
               <GamesList />
             </Suspense>
           </div>
           
-          <div className="lg:col-span-1 space-y-6">
+          {/* Right Column - Parlay & Calculator */}
+          <div className="lg:col-span-1 space-y-8">
             <Suspense fallback={<LoadingSkeleton />}>
-              <ParlayBuilder />
+              <ParlayBuilderEnhanced />
             </Suspense>
             
             <Suspense fallback={<LoadingSkeleton />}>
@@ -42,4 +59,3 @@ export default function Home() {
     </main>
   );
 }
-
