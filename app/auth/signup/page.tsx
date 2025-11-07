@@ -16,14 +16,16 @@ export default function SignUpPage() {
     password: '',
     confirmPassword: '',
     name: '',
+    acceptedTerms: false,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   };
 
@@ -38,6 +40,11 @@ export default function SignUpPage() {
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
+      return;
+    }
+
+    if (!formData.acceptedTerms) {
+      setError('You must accept the Terms of Service and Privacy Policy');
       return;
     }
 
@@ -196,6 +203,27 @@ export default function SignUpPage() {
                   required
                   minLength={6}
                 />
+              </div>
+
+              <div className="flex items-start">
+                <input
+                  type="checkbox"
+                  name="acceptedTerms"
+                  checked={formData.acceptedTerms}
+                  onChange={handleChange}
+                  className="mt-1 mr-3 w-4 h-4 bg-white/5 border-white/10 rounded"
+                  required
+                />
+                <label className="text-sm text-gray-400">
+                  I accept the{' '}
+                  <Link href="/legal/terms" target="_blank" className="text-green-400 hover:text-green-300">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/legal/privacy" target="_blank" className="text-green-400 hover:text-green-300">
+                    Privacy Policy
+                  </Link>
+                </label>
               </div>
 
               <Button

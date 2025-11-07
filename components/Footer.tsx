@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Heart, Github, Twitter } from 'lucide-react';
 
 export default function Footer() {
@@ -11,6 +12,15 @@ export default function Footer() {
             <span>Made with</span>
             <Heart className="w-4 h-4 text-red-500 fill-red-500" />
             <span>by sports analytics enthusiasts</span>
+          </div>
+          
+          <div className="flex items-center space-x-6">
+            <Link href="/legal/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
+              Terms of Service
+            </Link>
+            <Link href="/legal/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
+              Privacy Policy
+            </Link>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -39,7 +49,7 @@ export default function Footer() {
             Always gamble responsibly and within your means.
           </p>
           <p className="mt-2">
-            © 2025 Line Pointer. All predictions are for informational purposes only.
+            © 2025 LinePointer. All predictions are for informational purposes only.
           </p>
         </div>
       </div>
