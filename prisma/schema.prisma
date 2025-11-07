@@ -98,21 +98,6 @@ model Parlay {
   bets          Bet[]
 }
 
-model Favorite {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Favorite item
-  type      String   // 'team', 'player', 'game'
-  itemId    String   // team ID, player ID, or game ID
-  name      String
-  
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, type, itemId])
-}
-
 model Player {
   id              String   @id @default(cuid())
   name            String
