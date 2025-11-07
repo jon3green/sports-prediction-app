@@ -63,10 +63,19 @@ export async function POST(request: Request) {
       { user: userWithoutPassword, message: 'Account created successfully' },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup error:', error);
+    
+    // More specific error messages
+    if (error.message?.includes('database')) {
+      return NextResponse.json(
+        { error: 'Database connection error. Please try again.' },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Something went wrong' },
+      { error: error.message || 'Something went wrong' },
       { status: 500 }
     );
   }
