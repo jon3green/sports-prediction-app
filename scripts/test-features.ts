@@ -17,7 +17,6 @@ async function testParlaySystem() {
   // Create mock parlay legs
   const mockParlayLegs: ParlayLeg[] = [
     {
-      id: '1',
       gameId: 'game1',
       game: {
         id: 'game1',
@@ -35,7 +34,6 @@ async function testParlaySystem() {
       probability: 65,
     },
     {
-      id: '2',
       gameId: 'game2',
       game: {
         id: 'game2',
@@ -53,7 +51,6 @@ async function testParlaySystem() {
       probability: 70,
     },
     {
-      id: '3',
       gameId: 'game3',
       game: {
         id: 'game3',
