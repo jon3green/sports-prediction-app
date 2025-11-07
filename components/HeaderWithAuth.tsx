@@ -89,8 +89,6 @@ export default function HeaderWithAuth() {
           <div className="hidden md:flex items-center space-x-3">
             <NotificationBell />
             
-            {/* Auth Section Wrapper */}
-            <div>
           <div className="hidden md:flex items-center space-x-2">
             {status === 'loading' ? (
               <div className="h-10 w-24 bg-white/5 rounded-md animate-pulse" />
