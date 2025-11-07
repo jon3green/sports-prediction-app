@@ -25,8 +25,8 @@ export default function HeaderWithAuth() {
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Line Pointer</h1>
-              <p className="text-xs text-gray-400">AI Sports Predictions</p>
+              <h1 className="text-xl font-bold text-white">LinePointer</h1>
+              <p className="text-xs text-gray-400">Sharp Lines. Smart Bets.</p>
             </div>
           </Link>
 

@@ -85,18 +85,19 @@ export default function HeroNew() {
           </motion.div>
 
           <h1 className="heading-xl mb-6">
-            <span className="text-white">The Future of</span>
-            <br />
-            <span className="text-gradient bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">
-              Sports Betting
-            </span>
-            <span className="text-white"> Intelligence</span>
+            <span className="text-white">LinePointer</span>
           </h1>
+
+          <p className="text-3xl font-bold mb-8">
+            <span className="text-gradient bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400">
+              Sharp Lines. Smart Bets.
+            </span>
+          </p>
 
           <p className="text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
             Powered by 7 data sources and advanced machine learning, LinePointer delivers 
-            the most accurate NFL and NCAAF predictions with real-time odds, value indicators, 
-            and professional-grade analytics.
+            the most accurate predictions with real-time odds, value indicators, 
+            and professional-grade analytics across NFL, NCAAF, NBA, and MLB.
           </p>
 
           {/* CTA Buttons */}
