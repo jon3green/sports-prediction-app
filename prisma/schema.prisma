@@ -209,3 +209,73 @@ model PlayerProp {
   @@index([gameId])
   @@index([playerId])
 }
+
+model Alert {
+  id              String   @id @default(cuid())
+  userId          String
+  
+  // Alert details
+  type            String   // 'value_bet', 'line_movement', 'game_start', 'result', 'arbitrage'
+  title           String
+  message         String
+  data            String?  // JSON data for alert details
+  
+  // Priority and status
+  priority        String   @default("normal") // 'low', 'normal', 'high', 'urgent'
+  read            Boolean  @default(false)
+  actionUrl       String?  // URL to navigate to
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime?
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Favorite {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Favorite details
+  type            String   // 'team', 'player', 'game'
+  entityId        String   // Team ID, Player ID, or Game ID
+  entityName      String
+  sport           String   // 'NFL', 'NCAAF', 'NBA', 'MLB'
+  
+  // Preferences
+  notifyOnGames   Boolean  @default(true)
+  notifyOnProps   Boolean  @default(true)
+  notifyOnNews    Boolean  @default(false)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@unique([userId, type, entityId])
+  @@index([userId])
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  
+  // Subscription details
+  tier            String   // 'free', 'basic', 'pro', 'premium'
+  status          String   // 'active', 'canceled', 'expired', 'trial'
+  
+  // Stripe details
+  stripeCustomerId      String?  @unique
+  stripeSubscriptionId  String?  @unique
+  stripePriceId         String?
+  stripeCurrentPeriodEnd DateTime?
+  
+  // Features
+  features        String?  // JSON array of enabled features
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  trialEndsAt     DateTime?
+  canceledAt      DateTime?
+}
