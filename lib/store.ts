@@ -3,8 +3,8 @@ import { persist } from 'zustand/middleware';
 import { ParlayLeg, Game } from './types';
 
 interface StoreState {
-  selectedLeague: 'NFL' | 'NCAAF' | 'ALL';
-  setSelectedLeague: (league: 'NFL' | 'NCAAF' | 'ALL') => void;
+  selectedLeague: 'NFL' | 'NCAAF' | 'NBA' | 'MLB' | 'ALL';
+  setSelectedLeague: (league: 'NFL' | 'NCAAF' | 'NBA' | 'MLB' | 'ALL') => void;
   
   parlayLegs: ParlayLeg[];
   addParlayLeg: (leg: ParlayLeg) => void;

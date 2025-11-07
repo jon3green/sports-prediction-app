@@ -7,9 +7,11 @@ export interface Team {
   conference?: string;
 }
 
+export type Sport = 'NFL' | 'NCAAF' | 'NBA' | 'MLB';
+
 export interface Game {
   id: string;
-  league: 'NFL' | 'NCAAF';
+  league: Sport;
   homeTeam: Team;
   awayTeam: Team;
   date: string;

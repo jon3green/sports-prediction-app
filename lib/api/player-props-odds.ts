@@ -64,14 +64,47 @@ export const PROP_MARKETS = {
   
   // Combo props
   PLAYER_RUSH_RECEPTION_YDS: 'player_rush_reception_yds',
+  
+  // NBA props
+  PLAYER_POINTS: 'player_points',
+  PLAYER_REBOUNDS: 'player_rebounds',
+  PLAYER_ASSISTS: 'player_assists',
+  PLAYER_THREES: 'player_threes',
+  PLAYER_BLOCKS: 'player_blocks',
+  PLAYER_STEALS: 'player_steals',
+  PLAYER_TURNOVERS: 'player_turnovers',
+  PLAYER_POINTS_REBOUNDS_ASSISTS: 'player_points_rebounds_assists',
+  PLAYER_BLOCKS_STEALS: 'player_blocks_steals',
+  PLAYER_DOUBLE_DOUBLE: 'player_double_double',
+  PLAYER_TRIPLE_DOUBLE: 'player_triple_double',
+  
+  // MLB props
+  PLAYER_HITS: 'player_hits',
+  PLAYER_TOTAL_BASES: 'player_total_bases',
+  PLAYER_RUNS: 'player_runs',
+  PLAYER_RBIS: 'player_rbis',
+  PLAYER_HOME_RUNS: 'player_home_runs',
+  PLAYER_STOLEN_BASES: 'player_stolen_bases',
+  PLAYER_STRIKEOUTS: 'player_strikeouts',
+  PLAYER_HITS_RUNS_RBIS: 'player_hits_runs_rbis',
+  PITCHER_STRIKEOUTS: 'pitcher_strikeouts',
+  PITCHER_HITS_ALLOWED: 'pitcher_hits_allowed',
+  PITCHER_WALKS: 'pitcher_walks',
+  PITCHER_EARNED_RUNS: 'pitcher_earned_runs',
 } as const;
 
 /**
- * Get all available player props for upcoming NFL/NCAAF games
+ * Get all available player props for upcoming games
  */
-export async function getAllPlayerProps(sport: 'nfl' | 'ncaaf' = 'nfl'): Promise<PlayerPropsResponse> {
+export async function getAllPlayerProps(sport: 'nfl' | 'ncaaf' | 'nba' | 'mlb' = 'nfl'): Promise<PlayerPropsResponse> {
   try {
-    const sportKey = sport === 'nfl' ? 'americanfootball_nfl' : 'americanfootball_ncaaf';
+    const sportKeyMap = {
+      nfl: 'americanfootball_nfl',
+      ncaaf: 'americanfootball_ncaaf',
+      nba: 'basketball_nba',
+      mlb: 'baseball_mlb',
+    };
+    const sportKey = sportKeyMap[sport];
     
     // Get all available markets
     const markets = Object.values(PROP_MARKETS).join(',');

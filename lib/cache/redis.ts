@@ -162,7 +162,7 @@ export async function cachePlayerList<T>(
  * Cache game odds
  */
 export async function cacheGameOdds<T>(
-  sport: 'nfl' | 'ncaaf',
+  sport: 'nfl' | 'ncaaf' | 'nba' | 'mlb',
   fetchFn: () => Promise<T>
 ): Promise<T> {
   const key = generateCacheKey('odds', sport, 'games');
@@ -173,7 +173,7 @@ export async function cacheGameOdds<T>(
  * Cache player props
  */
 export async function cachePlayerProps<T>(
-  sport: 'nfl' | 'ncaaf',
+  sport: 'nfl' | 'ncaaf' | 'nba' | 'mlb',
   playerName: string,
   fetchFn: () => Promise<T>
 ): Promise<T> {

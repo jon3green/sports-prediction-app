@@ -9,10 +9,17 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const sport = searchParams.get('sport') || 'nfl';
-    const sportKey = sport === 'nfl' ? 'americanfootball_nfl' : 'americanfootball_ncaaf';
+    
+    const sportKeyMap: Record<string, string> = {
+      nfl: 'americanfootball_nfl',
+      ncaaf: 'americanfootball_ncaaf',
+      nba: 'basketball_nba',
+      mlb: 'baseball_mlb',
+    };
+    const sportKey = sportKeyMap[sport] || 'americanfootball_nfl';
 
     // Wrap the API call with caching (2 minute TTL for odds)
-    const cachedData = await cacheGameOdds(sport as 'nfl' | 'ncaaf', async () => {
+    const cachedData = await cacheGameOdds(sport as 'nfl' | 'ncaaf' | 'nba' | 'mlb', async () => {
       const response = await axios.get(
       `${BASE_URL}/sports/${sportKey}/odds/`,
         {

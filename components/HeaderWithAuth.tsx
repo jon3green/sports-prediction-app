@@ -59,6 +59,24 @@ export default function HeaderWithAuth() {
             >
               NCAAF
             </Button>
+            <Button
+              variant={selectedLeague === 'NBA' ? 'default' : 'ghost'}
+              onClick={() => setSelectedLeague('NBA')}
+              className={cn(
+                selectedLeague === 'NBA' && 'gradient-green'
+              )}
+            >
+              NBA
+            </Button>
+            <Button
+              variant={selectedLeague === 'MLB' ? 'default' : 'ghost'}
+              onClick={() => setSelectedLeague('MLB')}
+              className={cn(
+                selectedLeague === 'MLB' && 'gradient-green'
+              )}
+            >
+              MLB
+            </Button>
             
             <Link href="/players">
               <Button variant="ghost">
@@ -187,6 +205,32 @@ export default function HeaderWithAuth() {
                 )}
               >
                 NCAAF
+              </Button>
+              <Button
+                variant={selectedLeague === 'NBA' ? 'default' : 'ghost'}
+                onClick={() => {
+                  setSelectedLeague('NBA');
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  'w-full',
+                  selectedLeague === 'NBA' && 'gradient-green'
+                )}
+              >
+                NBA
+              </Button>
+              <Button
+                variant={selectedLeague === 'MLB' ? 'default' : 'ghost'}
+                onClick={() => {
+                  setSelectedLeague('MLB');
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  'w-full',
+                  selectedLeague === 'MLB' && 'gradient-green'
+                )}
+              >
+                MLB
               </Button>
 
               <Link href="/players" onClick={() => setMobileMenuOpen(false)}>
