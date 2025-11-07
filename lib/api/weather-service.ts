@@ -2,9 +2,16 @@
  * Weather Impact Service
  * Integrates with OpenWeatherMap API to analyze weather impact on games
  * 
+ * API Key: 7bd6ec2cf5a769925a93213c4edb4dbe
  * Free Tier: 1,000 calls/day
- * Sign up: https://openweathermap.org/api
+ * Documentation: https://openweathermap.org/api
  */
+
+import axios from 'axios';
+import { cacheWeather } from '@/lib/cache/redis';
+
+const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || '7bd6ec2cf5a769925a93213c4edb4dbe';
+const OPENWEATHER_BASE = 'https://api.openweathermap.org/data/2.5';
 
 interface WeatherData {
   temperature: number; // Fahrenheit
