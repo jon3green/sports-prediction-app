@@ -35,9 +35,21 @@ export function generateCacheKey(prefix: string, ...parts: (string | number)[]):
 }
 
 /**
+ * Check if KV is available
+ */
+function isKVAvailable(): boolean {
+  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+/**
  * Get data from cache
  */
 export async function getFromCache<T>(key: string): Promise<T | null> {
+  if (!isKVAvailable()) {
+    console.log('[CACHE] KV not configured yet - skipping cache');
+    return null;
+  }
+
   try {
     const cached = await kv.get<T>(key);
     if (cached) {
@@ -60,6 +72,10 @@ export async function setInCache<T>(
   data: T,
   ttlSeconds: number
 ): Promise<void> {
+  if (!isKVAvailable()) {
+    return; // Silently skip if KV not configured
+  }
+
   try {
     await kv.set(key, data, { ex: ttlSeconds });
     console.log(`[CACHE SET] ${key} (TTL: ${ttlSeconds}s)`);
