@@ -6,17 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import HeaderWithAuth from '@/components/HeaderWithAuth';
 import Footer from '@/components/Footer';
-import { Search, TrendingUp, Target, Activity, Loader2 } from 'lucide-react';
+import { Search, TrendingUp, Target, Activity, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { ESPNPlayerStats } from '@/lib/api/espn-api';
-
-// Mock player data for props (will be fetched from The Odds API later)
-const mockPlayerProps = {
-  'Patrick Mahomes': [
-    { type: 'Passing Yards', line: 275.5, over: -115, under: -105 },
-    { type: 'Passing TDs', line: 2.5, over: 130, under: -155 },
-    { type: 'Completions', line: 24.5, over: -110, under: -110 },
-  ],
-};
+import { PlayerProp } from '@/lib/api/player-props-odds';
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<ESPNPlayerStats[]>([]);
@@ -24,6 +16,9 @@ export default function PlayersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPosition, setSelectedPosition] = useState<string>('ALL');
   const [selectedSport, setSelectedSport] = useState<'nfl' | 'ncaaf'>('nfl');
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  const [playerProps, setPlayerProps] = useState<{ [key: string]: PlayerProp[] }>({});
+  const [loadingProps, setLoadingProps] = useState<{ [key: string]: boolean }>({});
 
   // Fetch players on mount and when sport/position changes
   useEffect(() => {
@@ -85,6 +80,37 @@ export default function PlayersPage() {
   };
 
   const filteredPlayers = players;
+
+  // Fetch props for a specific player
+  const fetchPlayerProps = async (playerName: string, playerId: string) => {
+    if (playerProps[playerId]) {
+      // Already have props, just toggle
+      setExpandedPlayerId(expandedPlayerId === playerId ? null : playerId);
+      return;
+    }
+
+    setLoadingProps({ ...loadingProps, [playerId]: true });
+    setExpandedPlayerId(playerId);
+
+    try {
+      const response = await fetch(
+        `/api/props/odds?sport=${selectedSport}&player=${encodeURIComponent(playerName)}`
+      );
+      const data = await response.json();
+
+      if (data.success && data.props) {
+        setPlayerProps({ ...playerProps, [playerId]: data.props });
+      } else {
+        console.error('Failed to fetch props:', data.error);
+        setPlayerProps({ ...playerProps, [playerId]: [] });
+      }
+    } catch (error) {
+      console.error('Error fetching props:', error);
+      setPlayerProps({ ...playerProps, [playerId]: [] });
+    } finally {
+      setLoadingProps({ ...loadingProps, [playerId]: false });
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -293,17 +319,93 @@ export default function PlayersPage() {
                     </div>
                   )}
 
-                  {/* Player Props - Coming Soon */}
-                  <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <p className="text-xs text-yellow-400 text-center">
-                      📊 Player props from Hard Rock Bet coming soon! Upgrade The Odds API to unlock.
-                    </p>
-                  </div>
+                  {/* Player Props Section */}
+                  <div>
+                    <Button
+                      onClick={() => fetchPlayerProps(player.name, player.id)}
+                      className="w-full gradient-green flex items-center justify-center space-x-2"
+                      disabled={loadingProps[player.id]}
+                    >
+                      {loadingProps[player.id] ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Loading Props...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Target className="w-4 h-4" />
+                          <span>
+                            {expandedPlayerId === player.id && playerProps[player.id] 
+                              ? 'Hide' 
+                              : 'Show'} Player Props
+                          </span>
+                          {expandedPlayerId === player.id ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </>
+                      )}
+                    </Button>
 
-                  <Button className="w-full gradient-green flex items-center justify-center space-x-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>View Full Analysis</span>
-                  </Button>
+                    {/* Show Props if Expanded */}
+                    {expandedPlayerId === player.id && playerProps[player.id] && (
+                      <div className="mt-4 space-y-3">
+                        <h4 className="text-white font-semibold flex items-center space-x-2">
+                          <Target className="w-4 h-4 text-green-500" />
+                          <span>Live Props from The Odds API</span>
+                        </h4>
+
+                        {playerProps[player.id].length === 0 ? (
+                          <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                            <p className="text-xs text-yellow-400 text-center">
+                              No props available for this player right now. Check back closer to game time!
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {playerProps[player.id].map((prop, idx) => (
+                              <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/10">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div>
+                                    <span className="text-white font-medium text-sm">
+                                      {prop.propDescription}
+                                    </span>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                      {prop.sportsbook} • Line: {prop.line}
+                                    </p>
+                                  </div>
+                                  <Badge className="bg-purple-600/20 text-purple-400 text-xs">
+                                    {new Date(prop.gameTime).toLocaleDateString()}
+                                  </Badge>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button className="p-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 rounded text-green-400 text-sm transition-colors">
+                                    <div className="font-semibold">Over {prop.line}</div>
+                                    <div className="text-xs">
+                                      {prop.overOdds > 0 ? `+${prop.overOdds}` : prop.overOdds}
+                                    </div>
+                                  </button>
+                                  <button className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded text-red-400 text-sm transition-colors">
+                                    <div className="font-semibold">Under {prop.line}</div>
+                                    <div className="text-xs">
+                                      {prop.underOdds > 0 ? `+${prop.underOdds}` : prop.underOdds}
+                                    </div>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                          <p className="text-xs text-blue-400 text-center">
+                            ✅ Live data from The Odds API • Includes Hard Rock Bet & major sportsbooks
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}

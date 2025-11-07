@@ -10,7 +10,7 @@
 
 import axios from 'axios';
 
-const ODDS_API_KEY = process.env.NEXT_PUBLIC_ODDS_API_KEY;
+const ODDS_API_KEY = process.env.NEXT_PUBLIC_ODDS_API_KEY || '9843d3412159ce8b1e28413f97f0f438';
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
 interface OddsAPIResponse {
