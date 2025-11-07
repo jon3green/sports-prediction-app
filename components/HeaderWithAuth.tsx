@@ -7,6 +7,7 @@ import { TrendingUp, Menu, X, User, LogOut, LayoutDashboard, LogIn, UserPlus } f
 import { Button } from './ui/button';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
+import NotificationBell from './NotificationBell';
 
 export default function HeaderWithAuth() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -66,7 +67,12 @@ export default function HeaderWithAuth() {
             </Link>
           </nav>
 
-          {/* Auth Section */}
+          {/* Notification Bell & Auth Section */}
+          <div className="hidden md:flex items-center space-x-3">
+            <NotificationBell />
+            
+            {/* Auth Section Wrapper */}
+            <div>
           <div className="hidden md:flex items-center space-x-2">
             {status === 'loading' ? (
               <div className="h-10 w-24 bg-white/5 rounded-md animate-pulse" />
@@ -123,6 +129,7 @@ export default function HeaderWithAuth() {
                 </Link>
               </div>
             )}
+          </div>
           </div>
 
           {/* Mobile Menu Button */}
