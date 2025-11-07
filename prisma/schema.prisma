@@ -17,6 +17,7 @@ model User {
   password      String    // hashed
   name          String?
   image         String?
+  emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
@@ -29,6 +30,14 @@ model User {
   parlays       Parlay[]
   favorites     Favorite[]
   sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Session {
